@@ -2,19 +2,25 @@ package com.addressbook.service;
 
 import java.util.List;
 
-import com.addressbook.dto.UserDto;
+import com.addressbook.dto.AddUserDto;
+import com.addressbook.dto.UpdateUserDto;
 import com.addressbook.entity.UserEntity;
 
 public interface AddressBookService {
 
-	public UserEntity addUser(UserEntity user);
+	public String addUser(AddUserDto user);
 
-	public UserEntity updateUser(Long userId, UserDto user);
+	public String updateUser(Long userId, UpdateUserDto user);
 
 	public UserEntity getUserById(Long userId);
 
-	public void deleteUser(Long UserId);
+	public String deleteUser(Long UserId);
 
 	public List<UserEntity> getAllUser();
+	
+	public List<UserEntity> getUserByZip(int zip);
+	
+	public List<UserEntity> getUserBylastName(String lastName);
+	
 
 }

@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.addressbook.dto.UserDto;
-import com.addressbook.entity.AddressEntity;
+import com.addressbook.dto.AddUserDto;
+import com.addressbook.dto.UpdateUserDto;
 import com.addressbook.entity.UserEntity;
 import com.addressbook.service.AddressBookService;
 
@@ -29,50 +28,31 @@ public class AddressBookController {
 	AddressBookService userService;
 
 	@PostMapping("/addUser")
-	public String addUser(@Valid @RequestBody UserEntity userEntity) {
-		JSONObject response = new JSONObject();
-		try {
-			UserEntity userEntity1 = userService.addUser(userEntity);
-			response.put("status", "sucess");
-			response.put("message", "user added");
-			response.put("data", userEntity1);
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.put("status", "failure");
-			response.put("message", "bad request");
-
-		}
-		return response.toString();
+	public String addUser(@Valid @RequestBody AddUserDto userEntity) {
+		String response = userService.addUser(userEntity);
+		return response;
 	}
 
 	@GetMapping("/getUser/{id}")
 	public String getUserById(@PathVariable Long id) {
 		JSONObject response = new JSONObject();
-		try {
-
-			UserEntity userEntity = userService.getUserById(id);
+		UserEntity userEntity = userService.getUserById(id);
+		if(null != userEntity) {
 			response.put("status", "sucess");
 			response.put("message", "User Details");
 			response.put("data", userEntity);
-
-		} catch (Exception e) {
-			e.printStackTrace();
+		}else {
 			response.put("status", "failure");
-			response.put("message", "no user found");
+			response.put("message", "No user found");
+			response.put("data", userEntity);
 		}
 		return response.toString();
-
 	}
 
 	@PutMapping("/updateUser/{id}")
-	public String updateUser(@PathVariable Long id, @RequestBody UserDto user) {
-		JSONObject response = new JSONObject();
-		UserEntity userEntity = userService.updateUser(id, user);
-		response.put("status", "sucess");
-		response.put("message", "User Details Updated");
-		response.put("data", userEntity);
-		return response.toString();
+	public String updateUser(@PathVariable Long id, @RequestBody UpdateUserDto user) {
+		String response = userService.updateUser(id, user);
+		return response;
 
 	}
 
@@ -80,19 +60,52 @@ public class AddressBookController {
 	public String getAllUsers() {
 		JSONObject response = new JSONObject();
 		List<UserEntity> userEntity = userService.getAllUser();
-		response.put("status", "sucess");
-		response.put("message", "All User Details ");
-		response.put("data", userEntity);
+		if(userEntity.isEmpty()) {
+			response.put("status", "failure");
+			response.put("message", "No details found");
+		}else {
+			response.put("status", "sucess");
+			response.put("message", "All User Details ");
+			response.put("data", userEntity);
+		}
 		return response.toString();
-
 	}
 
 	@DeleteMapping("/deleteUserById")
 	public String deleteUserById(@RequestParam("id") Long id) {
+		String response = userService.deleteUser(id);
+		return response;
+
+	}
+	
+	@GetMapping("/getDetailsByLastName")
+	public String getDetailsByLastName(@RequestParam ("lastName") String lastName) {
 		JSONObject response = new JSONObject();
-		userService.deleteUser(id);
-		response.put("status", "sucess");
-		response.put("message", "User Deleted ");
+		List<UserEntity> userEntity = userService.getUserBylastName(lastName);
+		if(userEntity.isEmpty()) {
+			response.put("status", "failure");
+			response.put("message", "No details found");
+		}else {
+			response.put("status", "sucess");
+			response.put("message", "All User Details ");
+			response.put("data", userEntity);
+		}
+		return response.toString();
+	}
+	
+	@GetMapping("/getDetailsByZip")
+	public String getDetailsByZip(@RequestParam ("zip") int zip) {
+		JSONObject response = new JSONObject();
+		List<UserEntity> userEntity = userService.getUserByZip(zip);
+		if(userEntity.isEmpty()) {
+			response.put("status", "failure");
+			response.put("message", "No details found");
+		}else {
+			response.put("status", "sucess");
+			response.put("message", "All User Details ");
+			response.put("data", userEntity);
+		}
+		
 		return response.toString();
 
 	}
